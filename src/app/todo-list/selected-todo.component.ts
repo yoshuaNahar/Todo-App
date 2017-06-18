@@ -4,6 +4,7 @@ import { Todo } from "../shared/Todo";
 @Component({
   selector: 'app-selected-todo',
   templateUrl: './selected-todo.component.html',
+  styleUrls: ['./selected-todo.component.css'],
 })
 export class SelectedTodoComponent {
 
