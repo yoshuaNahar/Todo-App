@@ -1,0 +1,10 @@
+<div class="well">
+  <h4>{{selectedTodo.content}}</h4>
+  
+  <button class="btn btn-primary" (click)="setStartTime()" *ngIf="selectedTodo.started === undefined">Start Time
+  </button>
+  <button class="btn btn-danger" (click)="setStopTime()" *ngIf="selectedTodo.started !== undefined">Stop Time</button>
+  
+  <p *ngIf="selectedTodo.started !== undefined">Started at: {{selectedTodo.started}}</p>
+  <p *ngIf="selectedTodo.stopped !== undefined">Stopped at: {{selectedTodo.stopped}}</p>
+</div>
