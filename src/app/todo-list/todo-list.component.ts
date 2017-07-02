@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit } from "@angular/core";
-import { Http, RequestOptions } from "@angular/http";
 import { Todo } from "../shared/Todo";
+import { TodosHttpService } from "../shared/TodosHttpService";
 import { TodosService } from "../shared/TodosService";
 
 @Component({
@@ -11,28 +11,32 @@ import { TodosService } from "../shared/TodosService";
 export class TodoListComponent implements OnInit {
 
   // so that users can press left or right shift with enter And not create new _todo
-  private previousEventCode: string;
-  // so that I can send the data from that _todo to the server
-  private preiousFocusedElement: HTMLScriptElement;
+  private previousEventCode = "";
   // so that if a user clicks on a title and presses enter, a new _todo will be created
-  private focusOnTitle: boolean;
-  private focusedTodo: Todo;
+  private focusOnTitle = false;
 
-  constructor(private todosService: TodosService, private http: Http) {
+  private todos: Todo[] = [
+    new Todo(997, "create simple design", false),
+    new Todo(998, "write angular code", false),
+    new Todo(999, "drink coffee", true)
+  ];
+
+  constructor(private todosService: TodosService, private todosHttpService: TodosHttpService) {
   }
 
   ngOnInit(): void {
-
+    this.populateTodosArray(this.todosHttpService.getTodosFromServer());
   }
 
-  private addTodoToServer(todo: Todo): void {
-    const headers: Headers = new Headers({ "Content-Type": "application/json" });
-    const options = new RequestOptions(headers);
-
-    this.http.post("http://localhost:8080/" + window.location.pathname, todo, options);
+  private populateTodosArray(todosPromise: Promise<Todo[]>): void {
+    todosPromise.then(todos => {
+      for (const todo of todos) {
+        this.todos.push(todo);
+      }
+    });
   }
 
-  @HostListener("window:click", ["$event"])
+  @HostListener("click", ["$event"])
   private onClick(event: MouseEvent): void {
     console.log(event); // testing
     const clickedElement: HTMLScriptElement = <HTMLScriptElement>event.toElement;
@@ -42,71 +46,109 @@ export class TodoListComponent implements OnInit {
       this.focusOnTitle = true;
       return;
     } else if (clickedElement instanceof HTMLTextAreaElement) {
-      this.setFocusedTodoToClickedTodo(clickedElement);
+      this.setSelectedTodoToClickedTodo(clickedElement);
     }
     this.focusOnTitle = false;
   }
 
-  @HostListener("window:keydown", ["$event"])
-  private handleEvent(event: KeyboardEvent): void {
+  @HostListener("keydown", ["$event"])
+  private onKeyDdown(event: KeyboardEvent): void {
     const eventCode: string = event.code;
     const focusedElement: HTMLScriptElement = <HTMLScriptElement>document.activeElement;
 
     if (eventCode === "Enter" && !(this.previousEventCode === "ShiftLeft" || this.previousEventCode === "ShiftRight")) {
-      this.createNewTodoOnCorrectEventCode(focusedElement);
+      this.createNewTodo(focusedElement);
     } else if (eventCode === "ArrowDown" || eventCode === "ArrowUp") {
-      this.moveFocusOnCorrectEventCode(eventCode, focusedElement);
+      this.moveUpOrDown(eventCode, focusedElement);
     } else if (eventCode === "Backspace") {
-      this.deleteTodoOnCorrectEventCode(focusedElement);
-    } else if (this.preiousFocusedElement.className === "todo") {
-      // if the previousFocusedElement === _todo, save the changes to server
-      this.addTodoToServer();
+      this.deleteTodo(focusedElement);
     }
+
     this.increaseTextAreaHeightByScrollHeight(focusedElement);
 
     this.previousEventCode = event.code;
     console.log(event.code); // testing
     this.focusOnTitle = false;
-    this.preiousFocusedElement = focusedElement;
   }
 
-  private createNewTodoOnCorrectEventCode(focusedElement: HTMLScriptElement): void {
+  @HostListener("focusout", ["$event"])
+  private onFocusOut(event: FocusEvent): void {
+    console.log(event);
+
+    const focusedElement: HTMLScriptElement = <HTMLScriptElement>event.srcElement;
+
+    if (focusedElement instanceof HTMLTextAreaElement) {
+      this.addOrUpdateTodoOnServer(focusedElement);
+    }
+  }
+
+  private setSelectedTodoToClickedTodo(element: HTMLScriptElement) {
+    const todoId: number = this.getIdFromDataAttribute(element);
+
+    if (todoId !== -1) {
+      this.todosService.selectedTodo.emit(this.todos.find(todo => todo.id === todoId));
+    }
+  }
+
+  private getIdFromDataAttribute(element: HTMLScriptElement): number {
+    if (element.hasAttribute("data-id")) {
+      return Number(element.getAttribute("data-id"));
+    }
+    return -1;
+  }
+
+  private createNewTodo(element: HTMLScriptElement): void {
     event.preventDefault();
 
-    const indexOfElementWithCurrentFocus: number = this.getDataIndexFromTodo(focusedElement);
+    const todoId: number = this.getIdFromDataAttribute(element);
+    const todoIndex = this.todos.findIndex(todo => todo.id === todoId);
 
-    if (indexOfElementWithCurrentFocus !== -1 || this.focusOnTitle) {
-      this.todosService.getTodos().splice(indexOfElementWithCurrentFocus + 1, 0, new Todo("", false));
+    if (todoId !== -1 || this.focusOnTitle) {
+      this.todos.splice(todoIndex + 1, 0, new Todo(-1, "", false));
+      // ONLY IF YOU LOSE FOCUS OF THIS _TODO WILL IT BE SAVED!
+      // updating or adding _todo happens in focusout
     }
   }
 
-  private moveFocusOnCorrectEventCode(eventCode: string, focusedElement: HTMLScriptElement): void {
-    let indexOfElementWithCurrentFocus: number = this.getDataIndexFromTodo(focusedElement);
+  private moveUpOrDown(eventCode: string, element: HTMLScriptElement): void {
+    const todoId: number = this.getIdFromDataAttribute(element);
+    let todoIndex = this.todos.findIndex(todo => todo.id === todoId);
 
     if (eventCode === "ArrowDown") {
-      if (indexOfElementWithCurrentFocus < this.todosService.getTodos().length - 1) {
-        indexOfElementWithCurrentFocus++;
+      if (todoIndex < this.todos.length - 1) {
+        todoIndex++;
+        if (this.todos[todoIndex].finished) {
+          todoIndex++; // go to next index if finished!
+        }
       }
     } else {
-      if (indexOfElementWithCurrentFocus > 0) {
-        indexOfElementWithCurrentFocus--;
+      if (todoIndex > 0) {
+        todoIndex--;
+        if (this.todos[todoIndex].finished) {
+          todoIndex--; // go to next index if finished!
+        }
       }
     }
 
-    console.log(`[data-index="${indexOfElementWithCurrentFocus}"]`); // testing
+    console.log(`INDEX="${todoIndex}"`); // testing
+    const nextTodo = this.todos[todoIndex];
+    const nextTodoElement: HTMLScriptElement = <HTMLScriptElement>document.querySelector(`[data-id="${nextTodo.id}"]`);
+    console.log(nextTodoElement); // testing
+    nextTodoElement.focus();
 
-    const elementToGoTo: HTMLScriptElement = <HTMLScriptElement>document.querySelector(`[data-index="${indexOfElementWithCurrentFocus}"]`);
-    console.log(elementToGoTo); // testing
-    elementToGoTo.focus();
-    this.focusedTodo = this.todosService.getTodos()[indexOfElementWithCurrentFocus];
+    this.todosService.selectedTodo.emit(this.todos[todoIndex]);
   }
 
-  private deleteTodoOnCorrectEventCode(focusedElement: HTMLScriptElement): void {
-    const indexOfElementWithCurrentFocus: number = this.getDataIndexFromTodo(focusedElement);
-    console.log(indexOfElementWithCurrentFocus); // testing
-    if (this.todosService.getTodos()[indexOfElementWithCurrentFocus].content.length === 0 && this.todosService.getTodos().length > 1) {
-      this.todosService.getTodos().splice(indexOfElementWithCurrentFocus, 1);
+  private deleteTodo(htmlElement: HTMLScriptElement): void {
+    const todoId: number = this.getIdFromDataAttribute(htmlElement);
+    console.log(todoId); // testing
+    const todoIndex = this.todos.findIndex(todo => todo.id === todoId);
+
+    if (this.todos[todoIndex].content.length === 0 && this.todos.length > 1) {
+      this.todos.splice(todoIndex, 1);
       console.log("here"); // testing
+
+      this.todosHttpService.deleteTodoOnServer(todoId);
     }
   }
 
@@ -115,19 +157,39 @@ export class TodoListComponent implements OnInit {
     focusedElement.style.height = focusedElement.scrollHeight + "px";
   }
 
-  private setFocusedTodoToClickedTodo(clickedElement: HTMLScriptElement) {
-    const indexOfElementWithCurrentFocus: number = this.getDataIndexFromTodo(clickedElement);
+  private addOrUpdateTodoOnServer(focusedElement: HTMLScriptElement) {
+    const todoId = this.getIdFromDataAttribute(focusedElement);
+    const todo = this.todos.find(t => t.id === todoId);
 
-    if (indexOfElementWithCurrentFocus !== -1) {
-      this.focusedTodo = this.todosService.getTodos()[indexOfElementWithCurrentFocus];
+    if (todoId === -1) {
+      this.todosHttpService.addTodoOnServer(todo);
+    } else {
+      this.todosHttpService.updateTodoOnServer(todo);
     }
+    console.log("previousWasTodo"); // testing
   }
 
-  private getDataIndexFromTodo(element: HTMLScriptElement): number {
-    if (element.hasAttribute("data-index")) {
-      return Number(element.getAttribute("data-index"));
+  private deleteTodoOnButtonClick(todo: Todo): void {
+    console.log(`Todo to delete: ${todo.id}`);
+
+    const todoIndex = this.todos.findIndex(t => t.id === todo.id);
+    this.todos.splice(todoIndex, 1);
+
+    this.todosService.selectedTodo.emit(null);
+
+    this.todosHttpService.deleteTodoOnServer(todo.id);
+  }
+
+  private changeTodoStatus(todo: Todo): void {
+    console.log(todo); // testing
+
+    if (todo.finished) {
+      // remove the started and stopped times if you bring a _todo from done to _todo
+      todo.started = "";
+      todo.stopped = "";
     }
-    return -1;
+
+    todo.finished = !todo.finished;
   }
 
 }

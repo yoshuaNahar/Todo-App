@@ -1,54 +1,54 @@
-import { Component, Input } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { Todo } from "../shared/Todo";
 import { TodosService } from "../shared/TodosService";
+import { TodosHttpService } from "../shared/TodosHttpService";
 
 @Component({
   selector: "app-selected-todo",
   templateUrl: "./selected-todo.component.html",
   styleUrls: ["./selected-todo.component.css"]
 })
-export class SelectedTodoComponent {
+export class SelectedTodoComponent implements OnInit {
 
-  @Input() private selectedTodo: Todo;
-  // @Output() private todoFinished: EventEmitter<{ isFinished: boolean }> = new EventEmitter<{ isFinished: boolean }>();
+  private selectedTodo: Todo = null;
 
-  constructor(private todosService: TodosService) {
+  private static getCurrentTime(): string {
+    const date = new Date();
+    const hours = (date.getHours() < 10 ? "0" : "") + date.getHours();
+    const minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes();
+
+    return hours + ":" + minutes;
+  }
+
+  constructor(private todosService: TodosService, private todosHttpService: TodosHttpService) {
+  }
+
+  ngOnInit(): void {
+    this.todosService.selectedTodo
+      .subscribe(todo => this.selectedTodo = todo);
   }
 
   private setStartTime(): void {
-    this.selectedTodo.started = this.getCurrentTime();
+    this.selectedTodo.started = SelectedTodoComponent.getCurrentTime();
+
+    this.todosHttpService.updateTodoOnServer(this.selectedTodo);
   }
 
   private setStopTime(): void {
-    this.selectedTodo.stopped = this.getCurrentTime();
+    this.selectedTodo.stopped = SelectedTodoComponent.getCurrentTime();
+    this.selectedTodo.finished = true;
 
-    this.changeTodoStatusAndList();
+    this.todosHttpService.updateTodoOnServer(this.selectedTodo);
+
+    this.selectedTodo = null; // you are done with this _todo
   }
 
   private resetTimes(): void {
     this.selectedTodo.started = "";
     this.selectedTodo.stopped = "";
+    this.selectedTodo.finished = false;
 
-    this.changeTodoStatusAndList();
-  }
-
-  private changeTodoStatusAndList() {
-    let indexOfTodo;
-    if (this.selectedTodo.finished === false) {
-      indexOfTodo = this.todosService.getTodos().indexOf(this.selectedTodo);
-    } else {
-      indexOfTodo = this.todosService.getFinishedTodos().indexOf(this.selectedTodo);
-    }
-    console.log(`indexOfTodo: ${indexOfTodo}`); // testing
-
-    this.todosService.changeTodoStatusAndList(indexOfTodo, this.selectedTodo.finished);
-  }
-
-  private getCurrentTime(): string {
-    let date: Date = new Date();
-    let hours: string = (date.getHours() < 10 ? "0" : "") + date.getHours();
-    let minutes: string = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes();
-    return hours + ":" + minutes;
+    this.todosHttpService.updateTodoOnServer(this.selectedTodo);
   }
 
 }

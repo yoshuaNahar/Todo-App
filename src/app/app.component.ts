@@ -1,6 +1,5 @@
-import { Component, Input } from "@angular/core";
+import { Component } from "@angular/core";
 import "rxjs/add/operator/toPromise";
-import { Todo } from "./shared/Todo";
 
 @Component({
   selector: "app-root",
@@ -8,7 +7,4 @@ import { Todo } from "./shared/Todo";
   styleUrls: ["./app.component.css"]
 })
 export class AppComponent {
-
-  @Input() private focusedTodo: Todo = null;
-
 }

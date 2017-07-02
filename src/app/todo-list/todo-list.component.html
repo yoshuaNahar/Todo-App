@@ -1,29 +1,36 @@
 <div class="todo_list">
   <input name="todos_title" value="Todo"/>
-  <div class="todo" *ngFor="let todo of this.todosService.getTodos(); let i = index">
-  <span class="glyphicon glyphicon-unchecked todo_icon" aria-hidden="true"
-        (click)="this.todosService.changeTodoStatusAndList(i, todo.finished)"></span>
-    <textarea name="todo_text" placeholder="..." rows="1" cols="1"
-              [ngStyle]="{textDecoration: todo.finished ? 'line-through' : 'none'}" [attr.data-index]="i"
-              [(ngModel)]="todo.content"></textarea>
-    <button class="btn btn-xs todo_delete_button" (click)="this.todosService.deleteTodo(todo)">
-      <span class="glyphicon glyphicon-remove"></span>
-    </button>
+  <div class="todo" *ngFor="let todo of todos"> <!-- Because angular doesnt support multiple structural directives-->
+    <div *ngIf="!todo.finished">
+      <span class="glyphicon glyphicon-unchecked todo_icon" aria-hidden="true"
+            (click)="changeTodoStatus(todo)"></span>
+      <textarea name="todo_text" placeholder="..." rows="1" cols="1"
+                [attr.data-id]="todo.id"
+                [(ngModel)]="todo.content"></textarea>
+      <button class="btn btn-xs todo_delete_button" (click)="deleteTodoOnButtonClick(todo)">
+        <span class="glyphicon glyphicon-remove"></span>
+      </button>
+    </div>
   </div>
   
   <input name="finishedTodos_title" value="Done"/>
-  <div class="todo" *ngFor="let todo of this.todosService.getFinishedTodos(); let i = index">
-  <span class="glyphicon glyphicon-check todo_icon" aria-hidden="true"
-        (click)="this.todosService.changeTodoStatusAndList(i, true)"></span>
-    <textarea name="todo_text" placeholder="..." rows="1" cols="1"
-              [ngStyle]="{textDecoration: todo.finished ? 'line-through' : 'none'}" [attr.data-index]="i"
-              [(ngModel)]="todo.content"></textarea>
-    <span class="todo_time_span" *ngIf="todo.stopped !== ''"><input [(ngModel)]="todo.started"/>-<input
-      [(ngModel)]="todo.stopped"/></span>
-    <button class="btn btn-xs todo_delete_button" (click)="this.todosService.deleteTodo(todo)">
-      <span class="glyphicon glyphicon-remove"></span>
-    </button>
+  <div class="todo" *ngFor="let todo of todos">
+    <div *ngIf="todo.finished">
+      <span class="glyphicon glyphicon-check todo_icon" aria-hidden="true"
+            (click)="changeTodoStatus(todo)"></span>
+      <textarea name="todo_text" placeholder="..." rows="1" cols="1" style="text-decoration: line-through"
+                [attr.data-id]="todo.id"
+                [(ngModel)]="todo.content"></textarea>
+      <span class="todo_time_span" *ngIf="todo.stopped !== ''">
+      <input [(ngModel)]="todo.started"/>
+      -
+      <input [(ngModel)]="todo.stopped"/>
+    </span>
+      <button class="btn btn-xs todo_delete_button" (click)="deleteTodoOnButtonClick(todo)">
+        <span class="glyphicon glyphicon-remove"></span>
+      </button>
+    </div>
   </div>
+  
+  <br/>
 </div>
-
-<br>

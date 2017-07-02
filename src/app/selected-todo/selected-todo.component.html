@@ -1,12 +1,12 @@
-<div class="doing_todo well">
+<div class="doing_todo well" *ngIf="selectedTodo !== null">
   <input name="doing_title" value="Doing"/>
   <h4>{{selectedTodo.content}}</h4>
   
-  <button class="btn-sm btn-primary" (click)="setStartTime()" *ngIf="selectedTodo.started === ''">Start Time
+  <button class="btn-sm btn-primary" (click)="setStartTime()" *ngIf="selectedTodo.started === '' && !selectedTodo.finished">Start Time
   </button>
   <button class="btn-sm btn-danger" (click)="setStopTime()" *ngIf="selectedTodo.started !== '' && selectedTodo.stopped ===''">Stop Time
   </button>
-  <button class="btb-sm btn-warning" (click)="resetTimes()" *ngIf="selectedTodo.stopped !==''">Reset Times</button>
+  <button class="btn-sm btn-warning" (click)="resetTimes()" *ngIf="selectedTodo.finished">Reset Times</button>
   
   <div class="todo-times">
     <p class="todo_time" *ngIf="selectedTodo.started !== ''">Started: {{selectedTodo.started}}</p>
