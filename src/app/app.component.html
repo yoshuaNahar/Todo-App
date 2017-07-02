@@ -3,19 +3,6 @@
     <app-selected-todo *ngIf="focusedTodo != null" [selectedTodo]="focusedTodo"></app-selected-todo>
   </div>
   <div class="col-lg-6 col-md-6 col-sm-6 col-xs12">
-    <div class="todo_list">
-      <input name="todo_title" value="Todo's">
-      <div class="todo" *ngFor="let todo of todos; let i = index">
-        <span class="glyphicon glyphicon-unchecked todo_icon" aria-hidden="true" (click)="todo.finished = true"
-              *ngIf="!todo.finished"></span>
-        <span class="glyphicon glyphicon-check todo_icon" aria-hidden="true" (click)="todo.finished = false"
-              *ngIf="todo.finished"></span>
-        <textarea name="todo_text" placeholder="..." rows="1" cols="1"
-                  [ngStyle]="{textDecoration: todo.finished ? 'line-through' : 'none'}" [attr.data-index]="i"
-                  [(ngModel)]="todo.content"></textarea>
-        <span class="todo_time_span" *ngIf="todo.stopped !== undefined">{{todo.started}}-{{todo.stopped}}</span>
-      </div>
-      <br>
-    </div>
+    <app-todo-list [focusedTodo]="focusedTodo"></app-todo-list>
   </div>
 </div>

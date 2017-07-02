@@ -1,9 +1,9 @@
-import { TestBed, async, ComponentFixture } from '@angular/core/testing';
-
-import { AppComponent } from './app.component';
 import { DebugElement } from "@angular/core";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-describe('AppComponent', () => {
+import { AppComponent } from "./app.component";
+
+describe("AppComponent", () => {
 
   let fixture: ComponentFixture<AppComponent>;
   let component: AppComponent;
@@ -19,17 +19,8 @@ describe('AppComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create the AppComponent', async(() => {
+  it("should create the AppComponent", async(() => {
     expect(component).toBeTruthy();
-  }));
-
-  it(`should create new todo on enter key event'`, async(() => {
-    inputEl.triggerEventHandler('window:keydown', null);
-    fixture.detectChanges();
-
-    // how do I trigger specific keys pressed?
-
-    expect(component.todos.length).toBe(4);
   }));
 
 });

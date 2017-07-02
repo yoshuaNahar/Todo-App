@@ -1,0 +1,19 @@
+.todo_times {
+  margin-top: 10px;
+}
+
+.todo_time {
+  display: inline-block;
+}
+
+.doing_todo > input {
+  width: 100%;
+  max-width: 100%;
+  border: none;
+  background-color: inherit;
+  padding-bottom: 5px;
+  outline: none;
+  font-weight: bold;
+  font-size: 1.4em;
+  font-family: 'Roboto Condensed', arial, sans-serif
+}

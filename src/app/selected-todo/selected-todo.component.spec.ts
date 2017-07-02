@@ -1,8 +1,8 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { SelectedTodoComponent } from './selected-todo.component';
+import { SelectedTodoComponent } from "./selected-todo.component";
 
-describe('SelectedTodoComponent', () => {
+describe("SelectedTodoComponent", () => {
 
   let fixture: ComponentFixture<SelectedTodoComponent>;
   let component: SelectedTodoComponent;
@@ -16,7 +16,7 @@ describe('SelectedTodoComponent', () => {
     fixture.detectChanges(); // unsure if this is needed...
   });
 
-  it('should create the SelectedTodoComponent', () => {
+  it("should create the SelectedTodoComponent", () => {
     expect(component).toBeTruthy();
   });
 

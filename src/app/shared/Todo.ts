@@ -1,7 +1,7 @@
 export class Todo {
 
-  public started: string;
-  public stopped: string;
+  public started = "";
+  public stopped = "";
 
   constructor(public content: string, public finished: boolean) {
   }
