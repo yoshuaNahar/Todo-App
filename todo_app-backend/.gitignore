@@ -1,0 +1,13 @@
+target/
+
+### maven stuff ###
+.mvn/
+mvnw
+mvnw.cmd
+
+### hsqldb diskstorage ###
+hsqldb/
+
+### IntelliJ IDEA ###
+.idea
+*.iml
