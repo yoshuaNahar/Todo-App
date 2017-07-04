@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TodosRepository extends JpaRepository<Todos, Long> {
 
-    Todos findByUrlId(String urlId);
+  Todos findByUrlId(String urlId);
 
 }

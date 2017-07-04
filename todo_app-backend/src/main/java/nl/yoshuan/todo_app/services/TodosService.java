@@ -9,63 +9,75 @@ import org.springframework.stereotype.Service;
 @Service
 public class TodosService {
 
-    private TodosRepository todosRepository;
+  private TodosRepository todosRepository;
 
-    @Autowired
-    public TodosService(TodosRepository todosRepository) {
-        this.todosRepository = todosRepository;
+  @Autowired
+  public TodosService(TodosRepository todosRepository) {
+    this.todosRepository = todosRepository;
+  }
+
+  public Todos getTodos(String urlId) {
+    Todos todos = todosRepository.findByUrlId(urlId);
+
+    if (todos == null) {
+      todos = todosRepository.save(new Todos(urlId));
     }
 
-    public Todos getTodos(String urlId) {
-        Todos todos = todosRepository.findByUrlId(urlId);
+    return todos;
+  }
 
-        if (todos == null) {
-            todos = todosRepository.save(new Todos(urlId));
-        }
+  public boolean addTodo(String urlId, Todo todo) {
+    Todos todos = todosRepository.findByUrlId(urlId);
+    todos.getTodoList().add(todo);
 
-        return todos;
+    todosRepository.save(todos);
+
+    return true;
+  }
+
+  public boolean updateTodo(String urlId, Todo todo) {
+    Todos todos = todosRepository.findByUrlId(urlId);
+
+    // lambda not supported in 1.7
+    // todos.getTodoList()
+    //     .removeIf(t -> t.getId().equals(todo.getId())); // obj not primitive
+    for (Todo t : todos.getTodoList()) {
+      if (t.getId().equals(urlId)) {
+        todos.getTodoList().remove(t);
+      }
     }
 
-    public boolean addTodo(String urlId, Todo todo) {
-        Todos todos = todosRepository.findByUrlId(urlId);
-        todos.getTodoList().add(todo);
+    todos.getTodoList().add(todo);
+    // deleting first and readding because getting mismatch error
+    // possibly because I'm saving not merging.
 
-        todosRepository.save(todos);
+    todosRepository.save(todos);
 
-        return true;
+    return true;
+  }
+
+  public boolean deleteTodo(String urlId, Long todoId) {
+    Todos todos = todosRepository.findByUrlId(urlId);
+
+    // lambda not supported in 1.7
+    // todos.getTodoList()
+    //     .removeIf(t -> t.getId().equals(todo.getId())); // obj not primitive
+    for (Todo t : todos.getTodoList()) {
+      if (t.getId().equals(urlId)) {
+        todos.getTodoList().remove(t);
+      }
     }
+    todosRepository.save(todos);
 
-    public boolean updateTodo(String urlId, Todo todo) {
-        Todos todos = todosRepository.findByUrlId(urlId);
+    return true;
+  }
 
-        todos.getTodoList()
-                .removeIf(t -> t.getId().equals(todo.getId())); // obj not primitive
-        todos.getTodoList().add(todo);
-        // deleting first and readding because getting mismatch error
-        // possibly because I'm saving not merging.
+  public void saveTest() {
+    Todos todos = new Todos("asd");
+    todos.getTodoList().add(new Todo("Workout", "", "", false));
+    todosRepository.save(todos);
 
-        todosRepository.save(todos);
-
-        return true;
-    }
-
-    public boolean deleteTodo(String urlId, Long todoId) {
-        Todos todos = todosRepository.findByUrlId(urlId);
-
-        todos.getTodoList()
-                .removeIf(t -> t.getId().equals(todoId));
-
-        todosRepository.save(todos);
-
-        return true;
-    }
-
-    public void saveTest() {
-        Todos todos = new Todos("asd");
-        todos.getTodoList().add(new Todo("Workout", "", "", false));
-        todosRepository.save(todos);
-
-        System.out.println(todos);
-    }
+    System.out.println(todos);
+  }
 
 }

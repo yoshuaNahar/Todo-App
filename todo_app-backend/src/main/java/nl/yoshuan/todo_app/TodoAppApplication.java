@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Import;
 @Import(AppConfig.class)
 public class TodoAppApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(TodoAppApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(TodoAppApplication.class, args);
+  }
 
 }
