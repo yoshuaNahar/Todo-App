@@ -5,7 +5,7 @@ import { Todo } from "./Todo";
 @Injectable()
 export class TodosHttpService {
 
-  private static URL = `http://localhost:8080${window.location.pathname}`;
+  private static URL = `http://130.211.68.181:8080${window.location.pathname}`;
   private static OPTIONS = new RequestOptions(new Headers({ "Content-Type": "application/json" }));
 
   private static handleError(error: any): Promise<any> {

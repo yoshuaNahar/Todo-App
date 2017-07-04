@@ -54,7 +54,7 @@ public class TodosService {
     Todos todos = todosRepository.findByUrlId(urlId);
 
      todos.getTodoList()
-         .removeIf(t -> t.getId().equals(todo.getId())); // obj not primitive
+         .removeIf(t -> t.getId().equals(todoId)); // obj not primitive
 
     todosRepository.save(todos);
 
