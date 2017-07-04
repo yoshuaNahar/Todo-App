@@ -15,7 +15,7 @@ export class TodoListComponent implements OnInit {
   // so that if a user clicks on a title and presses enter, a new _todo will be created
   private focusOnTitle = false;
 
-  private todos: Todo[] = [
+  todos: Todo[] = [
     new Todo(997, "create simple design", false),
     new Todo(998, "write angular code", false),
     new Todo(999, "drink coffee", true)

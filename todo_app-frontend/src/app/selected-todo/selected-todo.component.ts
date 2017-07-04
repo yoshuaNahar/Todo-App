@@ -10,7 +10,7 @@ import { TodosHttpService } from "../shared/TodosHttpService";
 })
 export class SelectedTodoComponent implements OnInit {
 
-  private selectedTodo: Todo = null;
+  selectedTodo: Todo = null;
 
   private static getCurrentTime(): string {
     const date = new Date();
