@@ -38,14 +38,8 @@ public class TodosService {
   public boolean updateTodo(String urlId, Todo todo) {
     Todos todos = todosRepository.findByUrlId(urlId);
 
-    // lambda not supported in 1.7
-    // todos.getTodoList()
-    //     .removeIf(t -> t.getId().equals(todo.getId())); // obj not primitive
-    for (Todo t : todos.getTodoList()) {
-      if (t.getId().equals(urlId)) {
-        todos.getTodoList().remove(t);
-      }
-    }
+     todos.getTodoList()
+         .removeIf(t -> t.getId().equals(todo.getId())); // obj not primitive
 
     todos.getTodoList().add(todo);
     // deleting first and readding because getting mismatch error
@@ -59,14 +53,9 @@ public class TodosService {
   public boolean deleteTodo(String urlId, Long todoId) {
     Todos todos = todosRepository.findByUrlId(urlId);
 
-    // lambda not supported in 1.7
-    // todos.getTodoList()
-    //     .removeIf(t -> t.getId().equals(todo.getId())); // obj not primitive
-    for (Todo t : todos.getTodoList()) {
-      if (t.getId().equals(urlId)) {
-        todos.getTodoList().remove(t);
-      }
-    }
+     todos.getTodoList()
+         .removeIf(t -> t.getId().equals(todo.getId())); // obj not primitive
+
     todosRepository.save(todos);
 
     return true;
