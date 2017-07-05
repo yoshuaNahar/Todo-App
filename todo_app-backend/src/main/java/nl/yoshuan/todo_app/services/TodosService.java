@@ -28,8 +28,8 @@ public class TodosService {
 
   public boolean addTodo(String urlId, Todo todo) {
     Todos todos = todosRepository.findByUrlId(urlId);
-    todos.getTodoList().add(todo);
 
+    todos.getTodoList().add(todo);
     todosRepository.save(todos);
 
     return true;
@@ -38,13 +38,12 @@ public class TodosService {
   public boolean updateTodo(String urlId, Todo todo) {
     Todos todos = todosRepository.findByUrlId(urlId);
 
-     todos.getTodoList()
-         .removeIf(t -> t.getId().equals(todo.getId())); // obj not primitive
+    todos.getTodoList()
+        .removeIf(t -> t.getId().equals(todo.getId())); // obj not primitive
+    todosRepository.save(todos);
 
-    todos.getTodoList().add(todo);
-    // deleting first and readding because getting mismatch error
+    todos.getTodoList().add(todo); // deleting first and reading because getting mismatch error
     // possibly because I'm saving not merging.
-
     todosRepository.save(todos);
 
     return true;
@@ -53,9 +52,8 @@ public class TodosService {
   public boolean deleteTodo(String urlId, Long todoId) {
     Todos todos = todosRepository.findByUrlId(urlId);
 
-     todos.getTodoList()
-         .removeIf(t -> t.getId().equals(todoId)); // obj not primitive
-
+    todos.getTodoList()
+        .removeIf(t -> t.getId().equals(todoId)); // obj not primitive
     todosRepository.save(todos);
 
     return true;

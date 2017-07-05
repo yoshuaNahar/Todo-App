@@ -47,8 +47,7 @@ public class AppConfig {
     jpaProperties.put("hibernate.show_sql", true);
     jpaProperties.put("hibernate.format_sql", true);
     jpaProperties.put("hibernate.use_sql_comments", true);
-    jpaProperties.put("hibernate.hbm2ddl.auto",
-        "create-drop"); // validate: validate the schema, makes no changes to the database.
+    jpaProperties.put("hibernate.hbm2ddl.auto", "validate");
     jpaProperties.put("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
 
     factory.setJpaPropertyMap(jpaProperties);
