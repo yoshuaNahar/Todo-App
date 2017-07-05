@@ -1,0 +1,11 @@
+// added this, because otherwise angular can't find resources, because it
+// expects the resources on the save href as the base-href
+// See link: https://github.com/angular/angular-cli/issues/4211
+{
+  "/todo-app/**": {
+    "target": "http://localhost:4200/",
+    "pathRewrite": {
+      "^/todo-app": ""
+    }
+  }
+}
