@@ -25,15 +25,12 @@ export class TodoListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.populateTodosArray(this.todosHttpService.getTodosFromServer());
-  }
-
-  private populateTodosArray(todosPromise: Promise<Todo[]>): void {
-    todosPromise.then(todos => {
-      for (const todo of todos) {
-        this.todos.push(todo);
-      }
-    });
+    this.todosHttpService.getTodosFromServer()
+      .then(todos => {
+        for (const todo of todos) {
+          this.todos.push(todo);
+        }
+      });
   }
 
   @HostListener("click", ["$event"])
@@ -115,17 +112,17 @@ export class TodoListComponent implements OnInit {
     let todoIndex = this.todos.findIndex(todo => todo.id === todoId);
 
     if (eventCode === "ArrowDown") {
-      if (todoIndex < this.todos.length - 1) {
-        todoIndex++;
-        if (this.todos[todoIndex].finished) {
-          todoIndex++; // go to next index if finished!
+      for (let i = 0; todoIndex < this.todos.length - 1; i++) {
+        todoIndex++;  // go to next index if finished!
+        if (!this.todos[todoIndex].finished) {
+          break;
         }
       }
     } else {
-      if (todoIndex > 0) {
-        todoIndex--;
-        if (this.todos[todoIndex].finished) {
-          todoIndex--; // go to next index if finished!
+      for (let i = 0; todoIndex > 0; i++) {
+        todoIndex--; // go to next index if finished!
+        if (!this.todos[todoIndex].finished) {
+          break;
         }
       }
     }
@@ -162,7 +159,8 @@ export class TodoListComponent implements OnInit {
     const todo = this.todos.find(t => t.id === todoId);
 
     if (todoId === -1) {
-      this.todosHttpService.addTodoOnServer(todo);
+      todo.id = null;
+      this.todosHttpService.putTodoOnServer(todo);
     } else {
       this.todosHttpService.updateTodoOnServer(todo);
     }
