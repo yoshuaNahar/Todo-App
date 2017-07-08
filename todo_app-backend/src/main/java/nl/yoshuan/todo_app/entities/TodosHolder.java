@@ -13,44 +13,44 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "todos")
-public class Todos {
+@Table(name = "todos_holder")
+public class TodosHolder {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "todos_id", nullable = false, insertable = false, updatable = false)
+  @Column(name = "todos_holder_id", nullable = false, insertable = false, updatable = false)
   private Long id;
 
-  @Column(name = "url_id", nullable = false, updatable = false)
-  private String urlId;
+  @Column(name = "url", nullable = false, updatable = false)
+  private String url;
 
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   // orphanRemoval removes child in db if removed from this list
-  @JoinColumn(name = "todos_id", nullable = false, updatable = false)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   // unidirectional, so place @JoinColumn here
-  private List<Todo> todoList = new ArrayList<>();
+  @JoinColumn(name = "todos_id", nullable = false, updatable = false)
+  private List<Todo> todos = new ArrayList<>();
 
-  protected Todos() {
+  protected TodosHolder() {
   }
 
-  public Todos(String urlId) {
-    this.urlId = urlId;
+  public TodosHolder(String url) {
+    this.url = url;
   }
 
-  public String getUrlId() {
-    return urlId;
+  public String getUrl() {
+    return url;
   }
 
-  public List<Todo> getTodoList() {
-    return todoList;
+  public List<Todo> getTodos() {
+    return todos;
   }
 
   @Override
   public String toString() {
     return "Todos{" +
         "id=" + id +
-        ", urlId='" + urlId + '\'' +
-        ", todoList=" + todoList +
+        ", url='" + url + '\'' +
+        ", todos=" + todos +
         '}';
   }
 

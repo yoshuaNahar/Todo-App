@@ -44,12 +44,11 @@ public class AppConfig {
     factory.setDataSource(dataSource());
 
     Map<String, Object> jpaProperties = new HashMap<>();
+    jpaProperties.put("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
     jpaProperties.put("hibernate.show_sql", true);
     jpaProperties.put("hibernate.format_sql", true);
     jpaProperties.put("hibernate.use_sql_comments", true);
     jpaProperties.put("hibernate.hbm2ddl.auto", "validate");
-    jpaProperties.put("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
-
     factory.setJpaPropertyMap(jpaProperties);
 
     return factory;

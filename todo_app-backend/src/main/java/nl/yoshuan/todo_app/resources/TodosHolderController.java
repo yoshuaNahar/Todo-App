@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = "http://130.211.68.181") // dev = http://localhost:4200
-public class UrlController {
+@CrossOrigin(origins = "*") // prod = http://130.211.68.181
+public class TodosHolderController {
 
   private TodosHolderService todosHolderService;
 
   @Autowired
-  public UrlController(TodosHolderService todosHolderService) {
+  public TodosHolderController(TodosHolderService todosHolderService) {
     this.todosHolderService = todosHolderService;
   }
 
@@ -43,13 +43,6 @@ public class UrlController {
   public void deleteTodo(@PathVariable("url") String url,
       @PathVariable("todoId") Long todoId) {
     todosHolderService.deleteTodo(url, todoId);
-  }
-
-  @GetMapping("/test")
-  public String test() {
-    this.todosHolderService.saveTest();
-
-    return "Hello World!";
   }
 
 }
